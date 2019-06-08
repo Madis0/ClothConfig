@@ -2,13 +2,13 @@ package me.shedaniel.clothconfig2.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.mojang.datafixers.util.Pair;
 import me.shedaniel.clothconfig2.api.ConfigBuilder;
 import me.shedaniel.clothconfig2.api.ConfigCategory;
 import me.shedaniel.clothconfig2.gui.ClothConfigScreen;
-import net.minecraft.client.gui.DrawableHelper;
+import net.minecraft.client.gui.AbstractGui;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.Pair;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.List;
 import java.util.Map;
@@ -24,9 +24,9 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     private boolean listSmoothScroll = true;
     private boolean doesProcessErrors = true;
     private boolean doesConfirmSave = true;
-    private Identifier defaultBackground = DrawableHelper.BACKGROUND_LOCATION;
+    private ResourceLocation defaultBackground = AbstractGui.BACKGROUND_LOCATION;
     private Consumer<Screen> afterInitConsumer = screen -> {};
-    private Map<String, Identifier> categoryBackground = Maps.newHashMap();
+    private Map<String, ResourceLocation> categoryBackground = Maps.newHashMap();
     private Map<String, List<Pair<String, Object>>> dataMap = Maps.newLinkedHashMap();
     
     @Deprecated
@@ -148,12 +148,12 @@ public class ConfigBuilderImpl implements ConfigBuilder {
     }
     
     @Override
-    public Identifier getDefaultBackgroundTexture() {
+    public ResourceLocation getDefaultBackgroundTexture() {
         return defaultBackground;
     }
     
     @Override
-    public ConfigBuilder setDefaultBackgroundTexture(Identifier texture) {
+    public ConfigBuilder setDefaultBackgroundTexture(ResourceLocation texture) {
         this.defaultBackground = texture;
         return this;
     }

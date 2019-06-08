@@ -1,12 +1,12 @@
 package me.shedaniel.clothconfig2.gui.entries;
 
 import com.google.common.collect.Lists;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.MainWindow;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.Window;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.resources.I18n;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,10 +15,10 @@ import java.util.function.Supplier;
 public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     
     protected TextFieldWidget textFieldWidget;
-    protected ButtonWidget resetButton;
+    protected Button resetButton;
     protected Supplier<T> defaultValue;
     protected T original;
-    protected List<Element> widgets;
+    protected List<IGuiEventListener> widgets;
     
     protected TextFieldListEntry(String fieldName, T original, String resetButtonKey, Supplier<T> defaultValue) {
         this(fieldName, original, resetButtonKey, defaultValue, null);
@@ -28,7 +28,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
         super(fieldName, tooltipSupplier);
         this.defaultValue = defaultValue;
         this.original = original;
-        this.textFieldWidget = new TextFieldWidget(MinecraftClient.getInstance().textRenderer, 0, 0, 148, 18, "") {
+        this.textFieldWidget = new TextFieldWidget(Minecraft.getInstance().fontRenderer, 0, 0, 148, 18, "") {
             @Override
             public void render(int int_1, int int_2, float float_1) {
                 boolean f = isFocused();
@@ -39,17 +39,17 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
             }
             
             @Override
-            public void addText(String string_1) {
-                super.addText(stripAddText(string_1));
+            public void writeText(String string_1) {
+                super.writeText(stripAddText(string_1));
             }
         };
-        textFieldWidget.setMaxLength(999999);
+        textFieldWidget.setMaxStringLength(999999);
         textFieldWidget.setText(String.valueOf(original));
-        textFieldWidget.setChangedListener(s -> {
+        textFieldWidget.func_212954_a(s -> {
             if (!original.equals(s))
                 getScreen().setEdited(true);
         });
-        this.resetButton = new ButtonWidget(0, 0, MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(resetButtonKey)) + 6, 20, I18n.translate(resetButtonKey), widget -> {
+        this.resetButton = new Button(0, 0, Minecraft.getInstance().fontRenderer.getStringWidth(I18n.format(resetButtonKey)) + 6, 20, I18n.format(resetButtonKey), widget -> {
             TextFieldListEntry.this.textFieldWidget.setText(String.valueOf(defaultValue.get()));
             getScreen().setEdited(true);
         });
@@ -71,18 +71,18 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     @Override
     public void render(int index, int y, int x, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isSelected, float delta) {
         super.render(index, y, x, entryWidth, entryHeight, mouseX, mouseY, isSelected, delta);
-        Window window = MinecraftClient.getInstance().window;
+        MainWindow window = Minecraft.getInstance().mainWindow;
         this.resetButton.active = isEditable() && getDefaultValue().isPresent() && !isMatchDefault(textFieldWidget.getText());
         this.resetButton.y = y;
-        this.textFieldWidget.setIsEditable(isEditable());
+        this.textFieldWidget.setEnabled(isEditable());
         this.textFieldWidget.y = y + 1;
-        if (MinecraftClient.getInstance().textRenderer.isRightToLeft()) {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), window.getScaledWidth() - x - MinecraftClient.getInstance().textRenderer.getStringWidth(I18n.translate(getFieldName())), y + 5, 16777215);
+        if (Minecraft.getInstance().fontRenderer.getBidiFlag()) {
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(I18n.format(getFieldName()), window.getScaledWidth() - x - Minecraft.getInstance().fontRenderer.getStringWidth(I18n.format(getFieldName())), y + 5, 16777215);
             this.resetButton.x = x;
             this.textFieldWidget.x = x + resetButton.getWidth();
             setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
         } else {
-            MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(getFieldName()), x, y + 5, 16777215);
+            Minecraft.getInstance().fontRenderer.drawStringWithShadow(I18n.format(getFieldName()), x, y + 5, 16777215);
             this.resetButton.x = x + entryWidth - resetButton.getWidth();
             this.textFieldWidget.x = x + entryWidth - 148;
             setTextFieldWidth(textFieldWidget, 148 - resetButton.getWidth() - 4);
@@ -99,7 +99,7 @@ public abstract class TextFieldListEntry<T> extends TooltipListEntry<T> {
     }
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends IGuiEventListener> children() {
         return widgets;
     }
     

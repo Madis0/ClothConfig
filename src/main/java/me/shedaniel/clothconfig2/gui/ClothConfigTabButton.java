@@ -1,8 +1,8 @@
 package me.shedaniel.clothconfig2.gui;
 
-import net.minecraft.client.gui.widget.AbstractPressableButtonWidget;
+import net.minecraft.client.gui.widget.button.AbstractButton;
 
-public class ClothConfigTabButton extends AbstractPressableButtonWidget {
+public class ClothConfigTabButton extends AbstractButton {
     
     private int index = -1;
     private ClothConfigScreen screen;

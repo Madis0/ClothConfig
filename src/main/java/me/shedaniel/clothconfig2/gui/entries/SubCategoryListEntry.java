@@ -3,13 +3,13 @@ package me.shedaniel.clothconfig2.gui.entries;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.GlStateManager;
 import me.shedaniel.clothconfig2.api.AbstractConfigListEntry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.render.GuiLighting;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.sound.PositionedSoundInstance;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.SimpleSound;
+import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvents;
 
 import java.awt.*;
 import java.util.List;
@@ -17,11 +17,11 @@ import java.util.Optional;
 
 public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigListEntry>> {
     
-    private static final Identifier CONFIG_TEX = new Identifier("cloth-config2", "textures/gui/cloth_config.png");
+    private static final ResourceLocation CONFIG_TEX = new ResourceLocation("cloth-config2", "textures/gui/cloth_config.png");
     private String categoryName;
     private List<AbstractConfigListEntry> entries;
     private CategoryLabelWidget widget;
-    private List<Element> children;
+    private List<IGuiEventListener> children;
     private boolean expended;
     
     public SubCategoryListEntry(String categoryName, List<AbstractConfigListEntry> entries, boolean defaultExpended) {
@@ -55,11 +55,11 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         widget.rectangle.y = y;
         widget.rectangle.width = entryWidth + 19;
         widget.rectangle.height = 24;
-        MinecraftClient.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
-        GuiLighting.disable();
+        Minecraft.getInstance().getTextureManager().bindTexture(CONFIG_TEX);
+        RenderHelper.disableStandardItemLighting();
         GlStateManager.color4f(1, 1, 1, 1);
         blit(x - 15, y + 4, 24, expended ? 9 : 0, 9, 9);
-        MinecraftClient.getInstance().textRenderer.drawWithShadow(I18n.translate(categoryName), x, y + 5, -1);
+        Minecraft.getInstance().fontRenderer.drawStringWithShadow(I18n.format(categoryName), x, y + 5, -1);
         for(AbstractConfigListEntry entry : entries) {
             entry.setParent(getParent());
             entry.setScreen(getScreen());
@@ -94,7 +94,7 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
     }
     
     @Override
-    public List<? extends Element> children() {
+    public List<? extends IGuiEventListener> children() {
         return children;
     }
     
@@ -109,20 +109,20 @@ public class SubCategoryListEntry extends TooltipListEntry<List<AbstractConfigLi
         for(AbstractConfigListEntry entry : entries)
             if (entry.getError().isPresent()) {
                 if (error != null)
-                    return Optional.ofNullable(I18n.translate("text.cloth-config.multi_error"));
+                    return Optional.ofNullable(I18n.format("text.cloth-config.multi_error"));
                 return Optional.ofNullable((String) entry.getError().get());
             }
         return Optional.ofNullable(error);
     }
     
-    public class CategoryLabelWidget implements Element {
+    public class CategoryLabelWidget implements IGuiEventListener {
         private Rectangle rectangle = new Rectangle();
         
         @Override
         public boolean mouseClicked(double double_1, double double_2, int int_1) {
             if (rectangle.contains(double_1, double_2)) {
                 expended = !expended;
-                MinecraftClient.getInstance().getSoundManager().play(PositionedSoundInstance.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
+                Minecraft.getInstance().getSoundHandler().play(SimpleSound.master(SoundEvents.UI_BUTTON_CLICK, 1.0F));
                 return true;
             }
             return false;

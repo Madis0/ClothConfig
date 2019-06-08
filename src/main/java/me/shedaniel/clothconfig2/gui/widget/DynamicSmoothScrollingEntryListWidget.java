@@ -1,11 +1,11 @@
 package me.shedaniel.clothconfig2.gui.widget;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Element;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 
 import java.util.concurrent.Executors;
@@ -18,8 +18,8 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     
     static {
         EXECUTOR_SERVICE.scheduleWithFixedDelay(() -> {
-            if (MinecraftClient.getInstance() != null && MinecraftClient.getInstance().currentScreen != null)
-                for(Element child : MinecraftClient.getInstance().currentScreen.children())
+            if (Minecraft.getInstance() != null && Minecraft.getInstance().field_71462_r != null)
+                for(IGuiEventListener child : Minecraft.getInstance().field_71462_r.children())
                     if (child instanceof DynamicSmoothScrollingEntryListWidget)
                         ((DynamicSmoothScrollingEntryListWidget) child).updateScrolling();
         }, 0, 1000 / 60, TimeUnit.MILLISECONDS);
@@ -28,7 +28,7 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
     protected double scrollVelocity;
     protected boolean smoothScrolling = true;
     
-    public DynamicSmoothScrollingEntryListWidget(MinecraftClient client, int width, int height, int top, int bottom, Identifier backgroundLocation) {
+    public DynamicSmoothScrollingEntryListWidget(Minecraft client, int width, int height, int top, int bottom, ResourceLocation backgroundLocation) {
         super(client, width, height, top, bottom, backgroundLocation);
     }
     
@@ -140,27 +140,27 @@ public abstract class DynamicSmoothScrollingEntryListWidget<E extends DynamicEnt
             int minY = Math.min(Math.max((int) this.getScroll() * (this.bottom - this.top - height) / maxScroll + this.top, this.top), this.bottom - height);
             
             // Black Bar
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-            buffer.vertex(scrollbarPositionMinX, this.bottom, 0.0D).texture(0.0D, 1.0D).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, this.bottom, 0.0D).texture(1.0D, 1.0D).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, this.top, 0.0D).texture(1.0D, 0.0D).color(0, 0, 0, 255).next();
-            buffer.vertex(scrollbarPositionMinX, this.top, 0.0D).texture(0.0D, 0.0D).color(0, 0, 0, 255).next();
+            buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+            buffer.pos(scrollbarPositionMinX, this.bottom, 0.0D).tex(0.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+            buffer.pos(scrollbarPositionMaxX, this.bottom, 0.0D).tex(1.0D, 1.0D).color(0, 0, 0, 255).endVertex();
+            buffer.pos(scrollbarPositionMaxX, this.top, 0.0D).tex(1.0D, 0.0D).color(0, 0, 0, 255).endVertex();
+            buffer.pos(scrollbarPositionMinX, this.top, 0.0D).tex(0.0D, 0.0D).color(0, 0, 0, 255).endVertex();
             tessellator.draw();
             
             // Top
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-            buffer.vertex(scrollbarPositionMinX, minY + height, 0.0D).texture(0.0D, 1.0D).color(128, 128, 128, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, minY + height, 0.0D).texture(1.0D, 1.0D).color(128, 128, 128, 255).next();
-            buffer.vertex(scrollbarPositionMaxX, minY, 0.0D).texture(1.0D, 0.0D).color(128, 128, 128, 255).next();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0.0D, 0.0D).color(128, 128, 128, 255).next();
+            buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+            buffer.pos(scrollbarPositionMinX, minY + height, 0.0D).tex(0.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+            buffer.pos(scrollbarPositionMaxX, minY + height, 0.0D).tex(1.0D, 1.0D).color(128, 128, 128, 255).endVertex();
+            buffer.pos(scrollbarPositionMaxX, minY, 0.0D).tex(1.0D, 0.0D).color(128, 128, 128, 255).endVertex();
+            buffer.pos(scrollbarPositionMinX, minY, 0.0D).tex(0.0D, 0.0D).color(128, 128, 128, 255).endVertex();
             tessellator.draw();
             
             // Bottom
-            buffer.begin(7, VertexFormats.POSITION_UV_COLOR);
-            buffer.vertex(scrollbarPositionMinX, (minY + height - 1), 0.0D).texture(0.0D, 1.0D).color(192, 192, 192, 255).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).texture(1.0D, 1.0D).color(192, 192, 192, 255).next();
-            buffer.vertex((scrollbarPositionMaxX - 1), minY, 0.0D).texture(1.0D, 0.0D).color(192, 192, 192, 255).next();
-            buffer.vertex(scrollbarPositionMinX, minY, 0.0D).texture(0.0D, 0.0D).color(192, 192, 192, 255).next();
+            buffer.begin(7, DefaultVertexFormats.POSITION_TEX_COLOR);
+            buffer.pos(scrollbarPositionMinX, (minY + height - 1), 0.0D).tex(0.0D, 1.0D).color(192, 192, 192, 255).endVertex();
+            buffer.pos((scrollbarPositionMaxX - 1), (minY + height - 1), 0.0D).tex(1.0D, 1.0D).color(192, 192, 192, 255).endVertex();
+            buffer.pos((scrollbarPositionMaxX - 1), minY, 0.0D).tex(1.0D, 0.0D).color(192, 192, 192, 255).endVertex();
+            buffer.pos(scrollbarPositionMinX, minY, 0.0D).tex(0.0D, 0.0D).color(192, 192, 192, 255).endVertex();
             tessellator.draw();
         }
     }

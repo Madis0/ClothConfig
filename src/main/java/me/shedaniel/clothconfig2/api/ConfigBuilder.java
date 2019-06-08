@@ -2,7 +2,7 @@ package me.shedaniel.clothconfig2.api;
 
 import me.shedaniel.clothconfig2.impl.ConfigBuilderImpl;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.util.Identifier;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.function.Consumer;
 
@@ -57,9 +57,9 @@ public interface ConfigBuilder {
     
     boolean doesProcessErrors();
     
-    Identifier getDefaultBackgroundTexture();
+    ResourceLocation getDefaultBackgroundTexture();
     
-    ConfigBuilder setDefaultBackgroundTexture(Identifier texture);
+    ConfigBuilder setDefaultBackgroundTexture(ResourceLocation texture);
     
     Runnable getSavingRunnable();
     
